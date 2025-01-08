@@ -37,10 +37,15 @@ jar {
     from sourceSets.userdev.output
 }
 
-tasks.register('sourcesJar', Jar) {
-    dependsOn classes
+tasks.register('sourceJar', Jar) {
+    sourceSets.configureEach {
+        from it.allJava
+    }
     classifier = 'sources'
-    from sourceSets.main.allJava
+}
+
+artifacts {
+    archives sourceJar
 }
 
 repositories {
@@ -74,8 +79,8 @@ publishing {
     publications {
         aliyun(MavenPublication) {
             from components.java
+            artifact sourceJar
         }
-        artifact sourcesJar
     }
     repositories {
         maven {
