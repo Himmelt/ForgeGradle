@@ -1,13 +1,13 @@
 plugins {
     id 'net.minecrell.licenser' version '0.4.1'
-    id 'org.ajoberstar.grgit' version '3.0.0'
+    //id 'org.ajoberstar.grgit' version '3.0.0'
     id 'com.github.ben-manes.versions' version '0.20.0'
-  //id 'com.github.johnrengelman.shadow' version '2.0.4'
+    //id 'com.github.johnrengelman.shadow' version '2.0.4'
 }
 
 apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'eclipse'
+//apply plugin: 'maven-publish'
+//apply plugin: 'eclipse'
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -15,17 +15,17 @@ compileJava {
 }
 
 group = 'net.minecraftforge.gradle'
-version = gitVersion()
-def gitVersion() {
-    def raw = grgit.describe(longDescr: true, tags: true)
-    def desc = (raw == null ? 'unknown-unknown-unknown' : raw).split('-') as List
-    def hash = desc.remove(desc.size() - 1)
-    def offset = desc.remove(desc.size() - 1)
-    def tag = desc.join('-')
-    def branch = grgit.branch.current().name    
-    return "${tag}.${offset}" //${t -> if (branch != 'master') t << '-' + branch}"
-}
-println('Version: ' + version + ' Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
+version = '3.0.4'//gitVersion()
+// def gitVersion() {
+//     def raw = grgit.describe(longDescr: true, tags: true)
+//     def desc = (raw == null ? 'unknown-unknown-unknown' : raw).split('-') as List
+//     def hash = desc.remove(desc.size() - 1)
+//     def offset = desc.remove(desc.size() - 1)
+//     def tag = desc.join('-')
+//     def branch = grgit.branch.current().name    
+//     return "${tag}.${offset}" //${t -> if (branch != 'master') t << '-' + branch}"
+// }
+//println('Version: ' + version + ' Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 sourceSets {
     common
@@ -52,7 +52,9 @@ jar {
 }
 
 repositories {
-    jcenter()
+    //jcenter()
+    //maven { url 'http://localhost:8081/repository/maven-public/'}
+    maven { url 'https://maven.aliyun.com/repository/public/'}
     maven { url = 'https://maven.minecraftforge.net/' }
 }
 
@@ -68,10 +70,10 @@ license {
     exclude 'net/minecraftforge/gradle/common/util/JavaVersionParser.java'
 }
 
-wrapper {
-    gradleVersion = '4.9'
-    distributionType = Wrapper.DistributionType.ALL
-}
+// wrapper {
+//     gradleVersion = '4.9'
+//     distributionType = Wrapper.DistributionType.ALL
+// }
 
 dependencies {
     commonImplementation gradleApi()
@@ -95,40 +97,40 @@ dependencies {
 }
 
 //Gradle doesn't add it's own source when doing the API. So lets hack it in!
-import org.gradle.plugins.ide.eclipse.model.*
-import org.gradle.plugins.ide.eclipse.model.internal.*
-project.extensions.eclipse.classpath.file.whenMerged { Classpath cp ->
-    def gradleSrc = gradle.gradleHomeDir.absolutePath.replace(File.separator, '/') + '/src/'
-    cp.entries.each { entry ->
-        if ((entry in AbstractLibrary) && entry.library.file.name.startsWith('gradle-')) {
-            def type = (entry.library.file.name =~ "^gradle(-(.*))?-(${gradle.gradleVersion})")[0][2]
-            if (type == 'api') type = 'core-api' //Gradle name is different for cores
-            if (type == '') type = 'core'
-            entry.sourcePath = new FileReferenceFactory().fromPath(gradleSrc + type)
-        }
-    }
-}
+// import org.gradle.plugins.ide.eclipse.model.*
+// import org.gradle.plugins.ide.eclipse.model.internal.*
+// project.extensions.eclipse.classpath.file.whenMerged { Classpath cp ->
+//     def gradleSrc = gradle.gradleHomeDir.absolutePath.replace(File.separator, '/') + '/src/'
+//     cp.entries.each { entry ->
+//         if ((entry in AbstractLibrary) && entry.library.file.name.startsWith('gradle-')) {
+//             def type = (entry.library.file.name =~ "^gradle(-(.*))?-(${gradle.gradleVersion})")[0][2]
+//             if (type == 'api') type = 'core-api' //Gradle name is different for cores
+//             if (type == '') type = 'core'
+//             entry.sourcePath = new FileReferenceFactory().fromPath(gradleSrc + type)
+//         }
+//     }
+// }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            if (System.env.MAVEN_USER) {
-                url 'https://maven.minecraftforge.net/'
-                authentication {
-                    basic(BasicAuthentication)
-                }
-                credentials {
-                    username = System.env.MAVEN_USER ?: 'not'
-                    password = System.env.MAVEN_PASSWORD ?: 'set'
-                }
-            } else {
-                url 'file://' + rootProject.file('repo').getAbsolutePath()
-            }
-        }
-    }
-}
+// publishing {
+//     publications {
+//         mavenJava(MavenPublication) {
+//             from components.java
+//         }
+//     }
+//     repositories {
+//         maven {
+//             if (System.env.MAVEN_USER) {
+//                 url 'https://maven.minecraftforge.net/'
+//                 authentication {
+//                     basic(BasicAuthentication)
+//                 }
+//                 credentials {
+//                     username = System.env.MAVEN_USER ?: 'not'
+//                     password = System.env.MAVEN_PASSWORD ?: 'set'
+//                 }
+//             } else {
+//                 url 'file://' + rootProject.file('repo').getAbsolutePath()
+//             }
+//         }
+//     }
+// }
