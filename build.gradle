@@ -1,7 +1,3 @@
-//plugins {
-//    id 'com.github.ben-manes.versions' version '0.20.0'
-//}
-
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
@@ -11,7 +7,8 @@ compileJava {
 }
 
 group = 'org.soraworld.gradle'
-version = '3.0.196'
+version = '3.0.196-SNAPSHOT'
+def localEnv = System.env.BUILDER_SOURCE == 'Local'
 
 sourceSets {
     common
@@ -49,7 +46,7 @@ artifacts {
 }
 
 repositories {
-    // maven { url 'http://localhost:8081/repository/maven-public/' }
+    if (localEnv) maven { url 'http://localhost:8081/repository/maven-public/' }
     maven { url 'https://maven.aliyun.com/repository/public/' }
     maven { url 'https://maven.minecraftforge.net/' }
 }
@@ -58,8 +55,8 @@ dependencies {
     commonImplementation gradleApi()
     commonImplementation 'com.cloudbees:diff4j:1.2'
     commonImplementation 'commons-io:commons-io:2.4'
-    commonImplementation 'com.github.jponge:lzma-java:1.3' // replaces the LZMA binary
-    commonImplementation 'com.nothome:javaxdelta:2.0.1' // GDIFF implementation for BinPatches
+    commonImplementation 'com.github.jponge:lzma-java:1.3'
+    commonImplementation 'com.nothome:javaxdelta:2.0.1'
     commonImplementation 'com.google.code.gson:gson:2.8.5'
     commonImplementation 'com.google.guava:guava:26.0-jre'
     commonImplementation 'de.siegmar:fastcsv:1.0.2'
@@ -77,7 +74,7 @@ dependencies {
 
 publishing {
     publications {
-        aliyun(MavenPublication) {
+        maven(MavenPublication) {
             from components.java
             artifact sourceJar
         }
@@ -88,6 +85,15 @@ publishing {
             credentials {
                 username = System.env.ALIYUN_MVN_USERNAME
                 password = System.env.ALIYUN_MVN_PASSWORD
+            }
+        }
+        if (localEnv) {
+            maven {
+                url = 'http://localhost:8081/repository/local/'
+                credentials {
+                    username = 'admin'
+                    password = 'admin123'
+                }
             }
         }
     }
