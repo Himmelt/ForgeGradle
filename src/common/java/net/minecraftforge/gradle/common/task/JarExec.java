@@ -58,7 +58,12 @@ public class JarExec extends DefaultTask {
         File jar = getToolJar();
 
         // Locate main class in jar file
-        JarFile jarFile = new JarFile(jar);
+        JarFile jarFile;
+        try {
+            jarFile = new JarFile(jar);
+        } catch (Throwable e) {
+            throw new IOException("error in opening zip file " + jar.getAbsolutePath(), e);
+        }
         String mainClass = jarFile.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
         jarFile.close();
 
